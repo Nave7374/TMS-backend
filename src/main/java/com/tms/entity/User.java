@@ -3,8 +3,10 @@ package com.tms.entity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,6 +17,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -75,6 +78,14 @@ public class User {
         email = s.getEmail();
         role = s.getRole();
         isActive = true;
+    }
+    
+    @OneToMany(mappedBy = "user")
+    private List<Shipment> shipment = new ArrayList<Shipment>();
+    
+    public void addShipments(Shipment s) {
+    	shipment.add(s);
+    	s.setUser(this);
     }
 
     // Getters and Setters
@@ -162,5 +173,13 @@ public class User {
                 authorities
         );
     }
+
+	public List<Shipment> getShipment() {
+		return shipment;
+	}
+
+	public void setShipment(List<Shipment> shipment) {
+		this.shipment = shipment;
+	}
 	
 }

@@ -1,5 +1,6 @@
 package com.tms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tms.dto.LocationDto;
 
 import jakarta.persistence.Entity;
@@ -19,7 +20,8 @@ public class Location {
     private double longitude;
     
     @OneToOne(mappedBy = "location")
-    private Shipment shipment;
+    @JsonIgnore
+    private Vehicle vehicle;
 
     // Constructors
     public Location() {
@@ -56,11 +58,11 @@ public class Location {
         this.longitude = longitude;
     }
 
-	public Shipment getShipment() {
-		return shipment;
+	public Vehicle getVehicle() {
+		return vehicle;
 	}
 
-	public void setShipment(Shipment shipment) {
-		this.shipment = shipment;
+	public void setVehicle(Vehicle vehicle) {
+		this.vehicle = vehicle;
 	}
 }

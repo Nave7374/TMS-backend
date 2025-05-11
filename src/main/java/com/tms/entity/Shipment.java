@@ -3,14 +3,15 @@ package com.tms.entity;
 import java.util.Date;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tms.dto.ShipmentDTO;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 
 @Entity
@@ -28,18 +29,21 @@ public class Shipment {
     	shipmentNumber=generateShipmentNumber();
     	origin = s.getOrigin();
     	destination = s.getDestination();
-    	status = s.getStatus();
+    	status = "Driver will be Assigned Shortly";
     	vehicleType = s.getVehicleType();
     	shipmentDate = s.getShipmentDate();
+    	weight = s.getWeight();
     }
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "location_id")
-    private Location location;
     
     @OneToOne(mappedBy = "shipment")
     private Vehicle vehicle;
     
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    @JsonIgnore
+    private User user;
+    
+    private double weight;
     private String shipmentNumber;
     private String origin;
     private String destination;
@@ -55,7 +59,7 @@ public class Shipment {
 	}
 	
 	private String generateShipmentNumber() {
-        return "SHIP-" + UUID.randomUUID().toString();
+        return "SHIP-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
 	public String getShipmentNumber() {
@@ -110,20 +114,28 @@ public class Shipment {
 		this.vehicleType = vehicleType;
 	}
 
-	public Location getLocation() {
-		return location;
-	}
-
 	public Vehicle getVehicle() {
 		return vehicle;
 	}
 
-	public void setLocation(Location location) {
-		this.location = location;
-	}
-
 	public void setVehicle(Vehicle vehicle) {
 		this.vehicle = vehicle;
+	}
+
+	public double getWeight() {
+		return weight;
+	}
+
+	public void setWeight(double weight) {
+		this.weight = weight;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 

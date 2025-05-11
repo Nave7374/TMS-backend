@@ -8,7 +8,6 @@ public class VehicleDTO {
     private String model;
     private String type; 
     private int year;
-    private String status;
 	
     // Getters and Setters
     
@@ -25,9 +24,6 @@ public class VehicleDTO {
 	public int getYear() {
 		return year;
 	}
-	public String getStatus() {
-		return status;
-	}
 	
 	public void setRegistrationNumber(String registrationNumber) {
 		this.registrationNumber = registrationNumber;
@@ -41,9 +37,7 @@ public class VehicleDTO {
 	public void setYear(int year) {
 		this.year = year;
 	}
-	public void setStatus(String status) {
-		this.status = status;
-	}
+	
 	public String getType() {
 		return type;
 	}

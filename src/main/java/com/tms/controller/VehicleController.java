@@ -1,10 +1,12 @@
 package com.tms.controller;
 
+import com.tms.dto.AssignRequest;
 import com.tms.dto.VehicleDTO;
 import com.tms.entity.Vehicle;
 import com.tms.service.VehicleService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +26,13 @@ public class VehicleController {
     	return vehicleService.saveVehicle(vehicle);
     }
 
-    @GetMapping
+    @PostMapping("/assign")
+    public ResponseEntity<String> assignVehicleToShipment(@RequestBody AssignRequest request) {
+        vehicleService.assignToShipment(request.getVehicleID(), request.getShipmentID());
+        return ResponseEntity.ok("Assigned successfully");
+    }
+    
+    @GetMapping 
     public List<Vehicle> getAllVehicles() {
         return vehicleService.getAllVehicles();
     }
@@ -44,4 +52,10 @@ public class VehicleController {
     public void deleteVehicle(@PathVariable Long id) {
         vehicleService.deleteVehicle(id);
     }
+    
+    @GetMapping("/status")
+    public List<Vehicle> getAvailablevehicles(){
+    	return  vehicleService.findbyStatus(); 
+    }
+     
 }

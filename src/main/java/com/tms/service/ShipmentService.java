@@ -1,6 +1,5 @@
 package com.tms.service;
 
-import com.tms.dto.ShipmentDTO;
 import com.tms.entity.Shipment;
 import com.tms.repository.ShipmentRepository;
 
@@ -35,16 +34,6 @@ public class ShipmentService {
     // Delete Shipment
     public void deleteShipment(Long id) {
         shipmentRepository.deleteById(id);
-    }
-    
-    public Shipment bookShipment(ShipmentDTO dto) {
-        Shipment shipment = new Shipment();
-        shipment.setOrigin(dto.getOrigin());
-        shipment.setDestination(dto.getDestination());
-        shipment.setShipmentDate(dto.getShipmentDate());
-        shipment.setVehicleType(dto.getVehicleType());
-        shipment.setShipmentNumber(dto.getShipmentNumber());
-        return shipmentRepository.save(shipment);
     }
     
 }

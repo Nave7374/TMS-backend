@@ -34,4 +34,9 @@ public class UserService {
     public List<User> fetchAll(){
     	return userRepository.findAll();
     }
-}
+    
+    public Optional<User> findUserById(Long id){
+    	return userRepository.findById(id);
+    }
+    
+} 

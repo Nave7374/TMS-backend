@@ -1,9 +1,12 @@
 package com.tms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tms.dto.VehicleDTO;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,21 +25,27 @@ public class Vehicle {
     private String type;
     private String model;
     private int year;
-    private String status; // e.g., 'available', 'in use', etc.
+    @Enumerated(EnumType.STRING)
+    private VehicleStatus status;  // e.g., 'available', 'in use', etc.
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "shipment_id")
+    @JsonIgnore
     private Shipment shipment;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "location_id")
+    private Location location;
     
     public Vehicle() {
 		// TODO Auto-generated constructor stub
 	}
     
     public Vehicle(VehicleDTO vehicle){
+    	setStatus(VehicleStatus.AVAILABLE);
     	setMake(vehicle.getMake());
     	setModel(vehicle.getModel());
     	setRegistrationNumber(vehicle.getRegistrationNumber());
-    	setStatus(vehicle.getStatus());
     	setType(vehicle.getType());
     	setYear(vehicle.getYear());
     }
@@ -61,7 +70,7 @@ public class Vehicle {
 		return year;
 	}
 
-	public String getStatus() {
+	public VehicleStatus getStatus() {
 		return status;
 	}
 
@@ -85,8 +94,8 @@ public class Vehicle {
 		this.year = year;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setStatus(VehicleStatus assigned) {
+		this.status = assigned;
 	}
 
 	public String getType() {
