@@ -1,15 +1,21 @@
 package com.tms.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.tms.dto.LocationDto;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 
 @Entity
+@JsonIdentityInfo(
+		  generator = ObjectIdGenerators.PropertyGenerator.class,
+		  property = "id"
+		)
 public class Location {
 
     @Id
@@ -18,11 +24,12 @@ public class Location {
     
     private double latitude;
     private double longitude;
-    
-    @OneToOne(mappedBy = "location")
-    @JsonIgnore
-    private Vehicle vehicle;
 
+    @OneToOne
+    @JoinColumn(name="shipment_id")
+//    @JsonBackReference
+    private Shipment shipment;
+    
     // Constructors
     public Location() {
     	
@@ -58,11 +65,11 @@ public class Location {
         this.longitude = longitude;
     }
 
-	public Vehicle getVehicle() {
-		return vehicle;
+	public Shipment getShipment() {
+		return shipment;
 	}
 
-	public void setVehicle(Vehicle vehicle) {
-		this.vehicle = vehicle;
+	public void setShipment(Shipment shipment) {
+		this.shipment = shipment;
 	}
 }

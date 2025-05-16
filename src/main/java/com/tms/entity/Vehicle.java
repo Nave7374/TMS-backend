@@ -1,6 +1,7 @@
 package com.tms.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.tms.dto.VehicleDTO;
 
 import jakarta.persistence.CascadeType;
@@ -14,6 +15,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 
 @Entity
+@JsonIdentityInfo(
+		  generator = ObjectIdGenerators.PropertyGenerator.class,
+		  property = "id"
+		)
 public class Vehicle {
 
     @Id
@@ -30,18 +35,22 @@ public class Vehicle {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "shipment_id")
-    @JsonIgnore
+//    @JsonManagedReference
     private Shipment shipment;
     
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "location_id")
-    private Location location;
+    @Enumerated(EnumType.STRING)
+    private DriverStatus driverstatus;
+    
+    @OneToOne(mappedBy = "vehicle", cascade = CascadeType.ALL)
+//    @JsonBackReference
+    private Driver driver;
     
     public Vehicle() {
 		// TODO Auto-generated constructor stub
 	}
     
     public Vehicle(VehicleDTO vehicle){
+    	setDriverstatus(DriverStatus.AVAILABLE);
     	setStatus(VehicleStatus.AVAILABLE);
     	setMake(vehicle.getMake());
     	setModel(vehicle.getModel());
@@ -112,5 +121,21 @@ public class Vehicle {
 
 	public void setShipment(Shipment shipment) {
 		this.shipment = shipment;
-	}    
+	}
+
+	public Driver getDriver() {
+		return driver;
+	}
+
+	public void setDriver(Driver driver) {
+		this.driver = driver;
+	}
+
+	public DriverStatus getDriverstatus() {
+		return driverstatus;
+	}
+
+	public void setDriverstatus(DriverStatus driverstatus) {
+		this.driverstatus = driverstatus;
+	}
 }

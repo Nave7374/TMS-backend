@@ -3,9 +3,11 @@ package com.tms.entity;
 import java.util.Date;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.tms.dto.ShipmentDTO;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +17,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 
 @Entity
+@JsonIdentityInfo(
+		  generator = ObjectIdGenerators.PropertyGenerator.class,
+		  property = "id"
+		)
 public class Shipment {
 
     @Id
@@ -35,12 +41,17 @@ public class Shipment {
     	weight = s.getWeight();
     }
     
-    @OneToOne(mappedBy = "shipment")
+    @OneToOne(mappedBy = "shipment",cascade = CascadeType.ALL)
+//    @JsonBackReference
     private Vehicle vehicle;
+    
+    @OneToOne(mappedBy = "shipment",cascade = CascadeType.ALL)
+//    @JsonManagedReference
+    private Location location;
     
     @ManyToOne
     @JoinColumn(name="user_id")
-    @JsonIgnore
+//    @JsonIgnore
     private User user;
     
     private double weight;
@@ -136,6 +147,21 @@ public class Shipment {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
+	}
+
+	@Override
+	public String toString() {
+		return "Shipment [id=" + id + ", location=" + location + ",  weight=" + weight
+				+ ", shipmentNumber=" + shipmentNumber + ", origin=" + origin + ", destination=" + destination
+				+ ", status=" + status + ", vehicleType=" + vehicleType + ", shipmentDate=" + shipmentDate + "]";
 	}
 
 

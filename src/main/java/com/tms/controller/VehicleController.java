@@ -1,6 +1,7 @@
 package com.tms.controller;
 
 import com.tms.dto.AssignRequest;
+import com.tms.dto.DriverAssignRequest;
 import com.tms.dto.VehicleDTO;
 import com.tms.entity.Vehicle;
 import com.tms.service.VehicleService;
@@ -32,6 +33,12 @@ public class VehicleController {
         return ResponseEntity.ok("Assigned successfully");
     }
     
+    @PostMapping("/assign/driver")
+    public ResponseEntity<String> assignVehicleToDriver(@RequestBody DriverAssignRequest request) {
+        vehicleService.assignToDriver(request.getVehicleID(), request.getDriverID());
+        return ResponseEntity.ok("Assigned successfully");
+    }
+    
     @GetMapping 
     public List<Vehicle> getAllVehicles() {
         return vehicleService.getAllVehicles();
@@ -53,9 +60,14 @@ public class VehicleController {
         vehicleService.deleteVehicle(id);
     }
     
-    @GetMapping("/status")
+    @GetMapping("/status/available")
     public List<Vehicle> getAvailablevehicles(){
     	return  vehicleService.findbyStatus(); 
+    }
+    
+    @GetMapping("/status/assigned")
+    public List<Vehicle> getAssignedvehicles(){
+    	return  vehicleService.findbyDriverStatus(); 
     }
      
 }

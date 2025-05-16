@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.tms.dto.SignupRequest;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -80,12 +81,17 @@ public class User {
         isActive = true;
     }
     
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user" , cascade = CascadeType.ALL)
     private List<Shipment> shipment = new ArrayList<Shipment>();
     
     public void addShipments(Shipment s) {
     	shipment.add(s);
     	s.setUser(this);
+    }
+    
+    public void removeShipment(Shipment s) {
+    	shipment.remove(s);
+    	s.setUser(null);
     }
 
     // Getters and Setters

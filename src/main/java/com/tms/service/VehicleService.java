@@ -1,9 +1,14 @@
 package com.tms.service;
 
+import com.tms.entity.Driver;
+import com.tms.entity.DriverStatus;
 import com.tms.entity.Shipment;
+import com.tms.entity.ShipmentHistory;
 import com.tms.entity.Vehicle;
 import com.tms.entity.VehicleStatus;
 import com.tms.exception.ResourceNotFoundException;
+import com.tms.repository.DriverRepository;
+import com.tms.repository.ShipmentHistoryRepository;
 import com.tms.repository.ShipmentRepository;
 import com.tms.repository.VehicleRepository;
 
@@ -21,23 +26,25 @@ public class VehicleService {
 
     @Autowired
     private ShipmentRepository shipmentRepository;
+
+    @Autowired
+    private ShipmentHistoryRepository historyRepository; 
     
-    // Create or Update Vehicle
+    @Autowired
+    private DriverRepository driverRepository; 
+    
     public Vehicle saveVehicle(Vehicle vehicle) {
         return vehicleRepository.save(vehicle);
     }
 
-    // Get all Vehicles
     public List<Vehicle> getAllVehicles() {
         return vehicleRepository.findAll();
     }
 
-    // Get Vehicle by ID
     public Optional<Vehicle> getVehicleById(Long id) {
         return vehicleRepository.findById(id);
     }
 
-    // Delete Vehicle
     public void deleteVehicle(Long id) {
         vehicleRepository.deleteById(id);
     }
@@ -53,5 +60,23 @@ public class VehicleService {
 		vehicle.setShipment(shipment);
 		shipment.setVehicle(vehicle);
 		vehicleRepository.save(vehicle);
+	}
+
+	public void assignToDriver(Long vehicleID, Long driverID) { 
+		Vehicle vehicle = vehicleRepository.findById(vehicleID).orElseThrow(()->new ResourceNotFoundException("Vehicle Not Found with the id "+vehicleID));
+		Driver driver = driverRepository.findById(vehicleID).orElseThrow(()->new ResourceNotFoundException("Vehicle Not Found with the id "+driverID));
+		vehicle.setDriverstatus(DriverStatus.ASSIGNED);
+		vehicle.setDriver(driver);
+		driver.setVehicle(vehicle);
+		vehicle.getShipment().setStatus("Driver Assigned");
+		ShipmentHistory s = new ShipmentHistory(vehicle.getShipment());
+		s.setDriver(driver);
+		driver.setShipments(s);
+		historyRepository.save(s);
+		vehicleRepository.save(vehicle);
+	}
+
+	public List<Vehicle> findbyDriverStatus() {
+		return vehicleRepository.findByDriverstatusAndStatus(DriverStatus.AVAILABLE,VehicleStatus.ASSIGNED);
 	}
 }

@@ -36,4 +36,8 @@ public class ShipmentService {
         shipmentRepository.deleteById(id);
     }
     
+    public Optional<Shipment> getbyshipmentNumber(String s){
+    	return shipmentRepository.findByShipmentNumber(s);
+    }
+      
 }
