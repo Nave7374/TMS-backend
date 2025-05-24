@@ -1,6 +1,5 @@
 package com.tms.service;
 
-import com.tms.entity.DriverStatus;
 import com.tms.entity.Shipment;
 import com.tms.entity.Vehicle;
 import com.tms.entity.VehicleStatus;
