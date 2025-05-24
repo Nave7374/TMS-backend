@@ -41,7 +41,12 @@ public class Shipment {
     	weight = s.getWeight();
     }
     
-    @OneToOne(mappedBy = "shipment",cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "shipment",cascade = {
+		    CascadeType.PERSIST,
+		    CascadeType.MERGE,
+		    CascadeType.REFRESH,
+		    CascadeType.DETACH
+		})
 //    @JsonBackReference
     private Vehicle vehicle;
     

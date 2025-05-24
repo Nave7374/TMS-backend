@@ -1,30 +1,12 @@
-package com.tms.entity;
+package com.tms.DAO;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.tms.dto.DriverDTO;
+import com.tms.entity.ShipmentHistory;
+import com.tms.entity.Driver;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+public class DriverDao {
 
-@Entity
-@JsonIdentityInfo(
-		  generator = ObjectIdGenerators.PropertyGenerator.class,
-		  property = "id"
-		)
-public class Driver {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	private String firstname;
@@ -36,33 +18,26 @@ public class Driver {
 	private String username;
 	private String password;
 	
-	@OneToOne(cascade = {
-		    CascadeType.PERSIST,
-		    CascadeType.MERGE,
-		    CascadeType.REFRESH,
-		    CascadeType.DETACH
-		})
-	@JoinColumn(name = "vehicle_id")
-//	@JsonManagedReference
-	private Vehicle vehicle;
 	
-	@OneToMany(mappedBy = "driver" , cascade = CascadeType.ALL)
-	private List<ShipmentHistory> shipments = new ArrayList<ShipmentHistory>();
+	private VehicleDAO vehicle;
 	
-	public Driver() {
-	}
+	private List<ShipmentHistory> shipments;
 
-	public Driver(DriverDTO d) {
-		setFirstname(d.getFirstname());
-		setLastname(d.getLastname());
+	public DriverDao(Driver d) {
+		setId(d.getId());
+		setAge(d.getAge());
 		setEmail(d.getEmail());
+		setFirstname(d.getFirstname());
 		setGender(d.getGender());
+		setLastname(d.getLastname());
 		setPassword(d.getPassword());
 		setPhone(d.getPhone());
+		setShipments(d.getShipments());
 		setUsername(d.getUsername());
-		setAge(d.getAge());
+		if(d.getVehicle()!=null)setVehicle(new VehicleDAO(d.getVehicle()));
 	}
-
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -99,8 +74,12 @@ public class Driver {
 		return password;
 	}
 
-	public Vehicle getVehicle() {
+	public VehicleDAO getVehicle() {
 		return vehicle;
+	}
+
+	public List<ShipmentHistory> getShipments() {
+		return shipments;
 	}
 
 	public void setId(Long id) {
@@ -139,16 +118,15 @@ public class Driver {
 		this.password = password;
 	}
 
-	public void setVehicle(Vehicle vehicle) {
+	public void setVehicle(VehicleDAO vehicle) {
 		this.vehicle = vehicle;
 	}
 
-	public List<ShipmentHistory> getShipments() {
-		return shipments;
+	public void setShipments(List<ShipmentHistory> shipments) {
+		this.shipments = shipments;
 	}
-
-	public void setShipments(ShipmentHistory shipments) {
-		this.shipments.add(shipments);
-	}
+	
+	
+	
 	
 }

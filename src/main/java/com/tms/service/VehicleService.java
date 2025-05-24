@@ -1,5 +1,6 @@
 package com.tms.service;
 
+import com.tms.DAO.Update.VehicleUpdate;
 import com.tms.entity.Driver;
 import com.tms.entity.DriverStatus;
 import com.tms.entity.Shipment;
@@ -46,7 +47,19 @@ public class VehicleService {
     }
 
     public void deleteVehicle(Long id) {
-        vehicleRepository.deleteById(id);
+        Vehicle v = vehicleRepository.findById(id).orElse(null);
+        if (v.getDriver() != null) {
+            Driver d = v.getDriver();
+            d.setVehicle(null);
+            v.setDriver(null);
+        }
+        if (v.getShipment() != null) {
+            Shipment s = v.getShipment();
+            s.setVehicle(null);
+            s.setStatus("Driver Will Be Assigned Shortly");
+            v.setShipment(null);
+        }
+        vehicleRepository.delete(v);
     }
     
     public List<Vehicle> findbyStatus(){
@@ -78,5 +91,21 @@ public class VehicleService {
 
 	public List<Vehicle> findbyDriverStatus() {
 		return vehicleRepository.findByDriverstatusAndStatus(DriverStatus.AVAILABLE,VehicleStatus.ASSIGNED);
+	}
+
+	public void updateByVehicleID(VehicleUpdate vehicle,Long id) {
+		Vehicle v = vehicleRepository.findById(vehicle.getId()).orElse(null);
+		v.setMake(vehicle.getMake());
+		v.setModel(vehicle.getModel());
+		v.setRegistrationNumber(vehicle.getRegistrationNumber());
+		v.setStatus(vehicle.getStatus());
+		v.setYear(vehicle.getYear());
+		v.setType(vehicle.getType());
+		vehicleRepository.save(v);
+	}
+
+	public VehicleUpdate getVehicleUpdateById(Long id) {
+		Vehicle v = getVehicleById(id).orElse(null);
+		return new VehicleUpdate(v);
 	}
 }

@@ -6,45 +6,49 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
-@Entity
+@Entity(name = "usershipmenthistory")
 @JsonIdentityInfo(
 		  generator = ObjectIdGenerators.PropertyGenerator.class,
 		  property = "id"
 		)
-public class ShipmentHistory {
-
+public class UserShipmentHistory {
+	
 	@Id@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private int id;
 	private String origin;
 	private String shipmentnumber;
 	private String destination;
 	private Date date;
-	private String vehicleno;
 	
-	public ShipmentHistory() {
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
+	
+	public UserShipmentHistory() {
 	}
 	
-	@ManyToOne(fetch = FetchType.EAGER)
-//	@JsonManagedReference
-	@JoinColumn(name = "driver_id")
-	private Driver driver;
-	
-	public ShipmentHistory(Shipment s) {
+	public UserShipmentHistory(Shipment s) {
 		setDate(s.getShipmentDate());
-		setDestination(s.getDestination());
 		setOrigin(s.getOrigin());
+		setDestination(s.getDestination());
 		setShipmentnumber(s.getShipmentNumber());
-		setVehicleno(s.getVehicle().getRegistrationNumber());
+	}
+	
+	public User getUser() {
+		return user;
 	}
 
-	public Long getId() {
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public int getId() {
 		return id;
 	}
 
@@ -64,11 +68,7 @@ public class ShipmentHistory {
 		return date;
 	}
 
-	public Driver getDriver() {
-		return driver;
-	}
-
-	public void setId(Long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -88,15 +88,4 @@ public class ShipmentHistory {
 		this.date = date;
 	}
 
-	public void setDriver(Driver driver) {
-		this.driver = driver;
-	}
-
-	public String getVehicleno() {
-		return vehicleno;
-	}
-
-	public void setVehicleno(String vehicleno) {
-		this.vehicleno = vehicleno;
-	}	
 }

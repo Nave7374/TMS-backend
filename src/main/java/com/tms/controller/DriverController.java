@@ -1,27 +1,29 @@
 package com.tms.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tms.DAO.DriverDao;
+import com.tms.DAO.ShipmentHistoryForDriver;
+import com.tms.DAO.Update.DriverUpdate;
 import com.tms.dto.DriverDTO;
 import com.tms.dto.DriverLoginRequest;
-import com.tms.dto.LocationDto;
 import com.tms.entity.Driver;
-import com.tms.entity.Location;
-import com.tms.entity.ShipmentHistory;
 import com.tms.repository.DriverRepository;
 import com.tms.service.DriverService;
-import com.tms.service.TrackingService;
 
 @RestController
 @RequestMapping("/api/driver")
@@ -56,8 +58,8 @@ public class DriverController {
 	}
 	
 	@GetMapping
-	public List<Driver> getAllDrivers(){
-		return driverService.getAllDriver();
+	public List<DriverDao> getAllDrivers(){
+		return driverService.getAllDriver().stream().map(i->new DriverDao(i)).collect(Collectors.toList());
 	}
 	
 	@GetMapping("/username/{username}")
@@ -66,8 +68,33 @@ public class DriverController {
 	}
 	
 	@GetMapping("/shipmenthistory/{id}")
-	public List<ShipmentHistory> getShipmentHistory(@PathVariable Long id) {
+	public List<ShipmentHistoryForDriver> getShipmentHistory(@PathVariable Long id) {
 		return driverService.getShipmentHistory(id);
 	}
+	
+	@GetMapping("/{id}")
+	public Driver getDriverById(@PathVariable Long id) {
+		return driverService.findById(id).orElse(null);		
+	}
+	
+	@GetMapping("/update/{id}")
+	public DriverUpdate getDriverUpdateById(@PathVariable Long id) {
+		return driverService.findDriverUpdateByid(id);	
+	}
+	
+	@PutMapping("/update")
+	public ResponseEntity<String> updateDriver(@RequestBody DriverUpdate d) {
+		driverService.updateByid(d);
+//		driverRepository.save(d);
+		return ResponseEntity.ok("Updated");
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> deleteDriver(@PathVariable Long id){
+		driverService.deleteDriver(id);
+		return ResponseEntity.ok("Driver Deleted");
+	}
+	
+	
 	
 }

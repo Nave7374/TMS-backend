@@ -1,20 +1,14 @@
 package com.tms.entity;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-
-import org.springframework.security.core.userdetails.UserDetails;
 
 import com.tms.dto.SignupRequest;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -82,11 +76,17 @@ public class User {
     }
     
     @OneToMany(mappedBy = "user" , cascade = CascadeType.ALL)
+    private List<UserShipmentHistory> shipmenthistory = new ArrayList<UserShipmentHistory>();
+    
+    @OneToMany(mappedBy = "user" , cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Shipment> shipment = new ArrayList<Shipment>();
     
     public void addShipments(Shipment s) {
     	shipment.add(s);
     	s.setUser(this);
+    	UserShipmentHistory history = new UserShipmentHistory(s);
+    	shipmenthistory.add(history);
+    	history.setUser(this);
     }
     
     public void removeShipment(Shipment s) {
@@ -167,18 +167,6 @@ public class User {
     public void setActive(boolean active) {
         isActive = active;
     }
-    
-    public static UserDetails build(User user) {
-    	String role = user.getRole() != null ? user.getRole() : "USER";
-        Collection<? extends GrantedAuthority> authorities =
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                authorities
-        );
-    }
 
 	public List<Shipment> getShipment() {
 		return shipment;
@@ -186,6 +174,14 @@ public class User {
 
 	public void setShipment(List<Shipment> shipment) {
 		this.shipment = shipment;
+	}
+
+	public List<UserShipmentHistory> getShipmenthistory() {
+		return shipmenthistory;
+	}
+
+	public void setShipmenthistory(List<UserShipmentHistory> shipmenthistory) {
+		this.shipmenthistory = shipmenthistory;
 	}
 	
 }

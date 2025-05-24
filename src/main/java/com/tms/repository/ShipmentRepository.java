@@ -1,5 +1,6 @@
 package com.tms.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,5 +12,6 @@ import com.tms.entity.Shipment;
 public interface ShipmentRepository extends JpaRepository<Shipment, Long> {
 
 	Optional<Shipment> findByShipmentNumber(String shipmentNumber);
+	List<Shipment> findByUser_Id(Long id);
 	
 }

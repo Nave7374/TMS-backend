@@ -2,6 +2,7 @@ package com.tms.controller;
 
 import com.tms.dto.LocationDto;
 import com.tms.dto.ShipmentDTO;
+import com.tms.dto.ShipmentHistoryDto;
 import com.tms.entity.Location;
 import com.tms.entity.Shipment;
 import com.tms.entity.User;
@@ -10,10 +11,12 @@ import com.tms.service.TrackingService;
 import com.tms.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/shipments")
@@ -31,15 +34,18 @@ public class ShipmentController {
     
     @PostMapping("/book/{id}")
     public Shipment createShipment(@PathVariable Long id,@RequestBody ShipmentDTO shipment) {
-    	User user = userservice.findUserById(id).get();
+    	User user = userservice.findUserById(id).orElse(null);
     	Shipment s = new Shipment(shipment);
     	user.addShipments(s);
-        return shipmentService.saveShipment(s);
+    	userservice.saveUser(user);
+        return s;
     }
 
     @GetMapping
-    public List<Shipment> getAllShipments() {
-        return shipmentService.getAllShipments();
+    public List<ShipmentHistoryDto> getAllShipments() {
+    	List<Shipment> l = shipmentService.getAllShipments();
+    	List<ShipmentHistoryDto> history = l.stream().map(i-> new ShipmentHistoryDto(i)).collect(Collectors.toList());
+    	return history;
     }
 
     @GetMapping("/{id}")
@@ -48,13 +54,25 @@ public class ShipmentController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteShipment(@PathVariable Long id) {
+    public ResponseEntity<String> deleteShipment(@PathVariable Long id) {
         shipmentService.deleteShipment(id);
+        return ResponseEntity.ok("Shipment Deleted");
     }
     
     @GetMapping("/user/{id}")
-    public List<Shipment> getShipmentByUserId(@PathVariable Long id) {
-    		return userservice.findUserById(id).get().getShipment();
+    public ResponseEntity<List<ShipmentHistoryDto>> getShipmentByUserId(@PathVariable Long id) {
+//    		User user = userservice.findUserById(id).orElse(null);
+//    		List<Shipment> l = user.getShipment();
+//    		for(Shipment s:l) {
+//    			System.out.println(s.getId()+" "+ s.getOrigin() + " "+ s.getDestination()+" " + s.getShipmentNumber());
+//    		}
+//    		return l;
+    	List<Shipment>  list =  shipmentService.findByUserId(id);
+    	List<ShipmentHistoryDto> history = list.stream().map(i-> new ShipmentHistoryDto(i)).collect(Collectors.toList());
+    	for(ShipmentHistoryDto s:history) {
+			System.out.println(s.getId()+" "+ s.getOrigin() + " "+ s.getDestination()+" " + s.getShipmentNumber());
+		}
+    	return ResponseEntity.ok(history);
     }   
     
     @PostMapping("/location/{str}")

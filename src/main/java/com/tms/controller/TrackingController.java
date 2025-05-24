@@ -7,6 +7,7 @@ import com.tms.service.ShipmentService;
 import com.tms.service.TrackingService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,12 +27,13 @@ public class TrackingController {
     }
 
     @GetMapping("/get/{str}")
-    public Location getLocation(@PathVariable String str) {
+    public ResponseEntity<Location> getLocation(@PathVariable String str) {
     	Shipment s = shipmentService.getbyshipmentNumber(str).orElse(null);
 //    	System.out.println("Gets triggered");
     	System.out.println(s);
-        return s.getLocation();
-    }
+    	if(s.getLocation()==null) return ResponseEntity.noContent().build();
+    	return ResponseEntity.ok(s.getLocation());
+     }
     
     @DeleteMapping("/{id}")
     public void deletLocation(@PathVariable Long id) {

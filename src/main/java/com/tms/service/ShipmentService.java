@@ -1,6 +1,9 @@
 package com.tms.service;
 
+import com.tms.entity.DriverStatus;
 import com.tms.entity.Shipment;
+import com.tms.entity.Vehicle;
+import com.tms.entity.VehicleStatus;
 import com.tms.repository.ShipmentRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +36,25 @@ public class ShipmentService {
 
     // Delete Shipment
     public void deleteShipment(Long id) {
-        shipmentRepository.deleteById(id);
+    	Shipment s = shipmentRepository.findById(id).orElse(null);
+    	if(s.getVehicle()!=null) {
+    		Vehicle v = s.getVehicle();
+    		v.setStatus(VehicleStatus.AVAILABLE);
+    		v.setShipment(null);
+    		s.setVehicle(null);
+    	}
+    	if(s.getUser()!=null) {
+    		s.getUser().removeShipment(s);
+    	}
+    	shipmentRepository.delete(s);
     }
     
     public Optional<Shipment> getbyshipmentNumber(String s){
     	return shipmentRepository.findByShipmentNumber(s);
     }
+
+	public List<Shipment> findByUserId(Long id) {
+		return shipmentRepository.findByUser_Id(id);
+	}
       
 }
