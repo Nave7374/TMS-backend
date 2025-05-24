@@ -2,7 +2,6 @@ package com.tms.service;
 
 import com.tms.DAO.SHipmentHistoryForUser;
 import com.tms.DAO.Update.UserUpdate;
-import com.tms.entity.Shipment;
 import com.tms.entity.User;
 import com.tms.exception.ResourceNotFoundException;
 import com.tms.repository.UserRepository;
