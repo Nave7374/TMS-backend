@@ -75,5 +75,12 @@ public class UserUpdate {
 	public void setRole(String role) {
 		this.role = role;
 	}
+
+	@Override
+	public String toString() {
+		return "UserUpdate [id=" + id + ", username=" + username + ", password=" + password + ", firstName=" + firstName
+				+ ", lastName=" + lastName + ", phoneNumber=" + phoneNumber + ", email=" + email + ", role=" + role
+				+ "]";
+	}
     
 }

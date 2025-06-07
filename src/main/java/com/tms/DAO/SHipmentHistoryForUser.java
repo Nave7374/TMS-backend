@@ -2,19 +2,19 @@ package com.tms.DAO;
 
 import java.util.Date;
 
-import com.tms.entity.User;
+import com.tms.DAO.Sample.UserDaoSample;
 import com.tms.entity.UserShipmentHistory;
 
 public class SHipmentHistoryForUser {
 
 	
-	private int id;
+	private Long id;
 	private String origin;
 	private String shipmentnumber;
 	private String destination;
 	private Date date;
 	
-	private User user;
+	private UserDaoSample user;
 	
 	public SHipmentHistoryForUser(UserShipmentHistory s){
 		setId(s.getId());
@@ -22,10 +22,10 @@ public class SHipmentHistoryForUser {
 		setDestination(s.getDestination());
 		setOrigin(s.getOrigin());
 		setShipmentnumber(s.getShipmentnumber());
-		setUser(s.getUser());
+		setUser(new UserDaoSample(s.getUser()));
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
@@ -45,12 +45,12 @@ public class SHipmentHistoryForUser {
 		return date;
 	}
 
-	public User getUser() {
+	public UserDaoSample getUser() {
 		return user;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setId(Long long1) {
+		this.id = long1;
 	}
 
 	public void setOrigin(String origin) {
@@ -69,7 +69,7 @@ public class SHipmentHistoryForUser {
 		this.date = date;
 	}
 
-	public void setUser(User user) {
+	public void setUser(UserDaoSample user) {
 		this.user = user;
 	}
 	

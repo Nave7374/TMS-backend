@@ -2,9 +2,7 @@ package com.tms.controller;
 
 import com.tms.dto.LocationDto;
 import com.tms.entity.Location;
-import com.tms.entity.Shipment;
-import com.tms.service.ShipmentService;
-import com.tms.service.TrackingService;
+import com.tms.service.interfaces.TrackingEntityService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,31 +10,24 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/tracking")
-@CrossOrigin(origins = "http://localhost:3000",allowedHeaders = "*")
+@CrossOrigin(origins = {"http://localhost:3000","https://transportmanagementsys.netlify.app"},allowedHeaders = "*")
 public class TrackingController {
 
 	@Autowired
-    private TrackingService trackingService;
-	
-	@Autowired
-	private ShipmentService shipmentService;
+    private TrackingEntityService trackingEntityService;
 
     @PostMapping("/save")
     public Location saveLocation(@RequestBody LocationDto location) {
-        return trackingService.saveLocation(new Location(location));
+        return trackingEntityService.saveLocation(location);
     }
 
     @GetMapping("/get/{str}")
     public ResponseEntity<Location> getLocation(@PathVariable String str) {
-    	Shipment s = shipmentService.getbyshipmentNumber(str).orElse(null);
-//    	System.out.println("Gets triggered");
-    	System.out.println(s);
-    	if(s.getLocation()==null) return ResponseEntity.noContent().build();
-    	return ResponseEntity.ok(s.getLocation());
+    	return trackingEntityService.getLocationByShipmentnumber(str);
      }
     
     @DeleteMapping("/{id}")
-    public void deletLocation(@PathVariable Long id) {
-    	trackingService.deleteLocation(id);
+    public ResponseEntity<?> deletLocation(@PathVariable Long id) {
+    	return trackingEntityService.deleteLocation(id);
    	}
 }

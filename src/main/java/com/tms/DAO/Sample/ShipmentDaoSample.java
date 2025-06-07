@@ -7,7 +7,7 @@ import com.tms.entity.Shipment;
 public class ShipmentDaoSample {
 
 	private Long id;
-	private double weight;
+	private Double weight;
     private String shipmentNumber;
     private String origin;
     private String destination;

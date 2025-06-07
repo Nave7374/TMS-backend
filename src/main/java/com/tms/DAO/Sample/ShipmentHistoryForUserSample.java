@@ -6,7 +6,7 @@ import com.tms.entity.UserShipmentHistory;
 
 public class ShipmentHistoryForUserSample {
 
-	private int id;
+	private Long id;
 	private String origin;
 	private String shipmentnumber;
 	private String destination;
@@ -20,7 +20,7 @@ public class ShipmentHistoryForUserSample {
 		setShipmentnumber(s.getShipmentnumber());
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
@@ -40,8 +40,8 @@ public class ShipmentHistoryForUserSample {
 		return date;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setId(Long long1) {
+		this.id = long1;
 	}
 
 	public void setOrigin(String origin) {

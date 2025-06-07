@@ -6,7 +6,7 @@ import com.tms.dto.AssignRequest;
 import com.tms.dto.DriverAssignRequest;
 import com.tms.dto.VehicleDTO;
 import com.tms.entity.Vehicle;
-import com.tms.service.VehicleService;
+import com.tms.service.interfaces.VehicleEntityService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,69 +14,63 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000",allowedHeaders = "*")
+@CrossOrigin(origins = {"http://localhost:3000","https://transportmanagementsys.netlify.app"},allowedHeaders = "*")
 @RequestMapping("/api/vehicles")
 public class VehicleController {
 
     @Autowired
-    private VehicleService vehicleService;
+    private VehicleEntityService vehicleEntityService;
 
     @PostMapping("/add")
     public Vehicle createVehicle(@RequestBody VehicleDTO vehicledto) {
-        Vehicle vehicle = new Vehicle(vehicledto);
-    	return vehicleService.saveVehicle(vehicle);
+    	return vehicleEntityService.saveVehicle(vehicledto);
     }
 
     @PostMapping("/assign")
     public ResponseEntity<String> assignVehicleToShipment(@RequestBody AssignRequest request) {
-        vehicleService.assignToShipment(request.getVehicleID(), request.getShipmentID());
-        return ResponseEntity.ok("Assigned successfully");
+        return vehicleEntityService.assignToShipment(request.getVehicleID(), request.getShipmentID());
     }
     
     @PostMapping("/assign/driver")
     public ResponseEntity<String> assignVehicleToDriver(@RequestBody DriverAssignRequest request) {
-        vehicleService.assignToDriver(request.getVehicleID(), request.getDriverID());
-        return ResponseEntity.ok("Assigned successfully");
+        return vehicleEntityService.assignToDriver(request.getVehicleID(), request.getDriverID());
     }
     
     @GetMapping 
     public List<VehicleDAO> getAllVehicles() {
-        return vehicleService.getAllVehicles().stream().map(i->new VehicleDAO(i)).collect(Collectors.toList());
+        return vehicleEntityService.getAllVehicles();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<String> putVehicle(@PathVariable Long id, @RequestBody VehicleUpdate vehicle) {
-    	vehicleService.updateByVehicleID(vehicle,id);
-    	return ResponseEntity.ok("Updated Successfully");
+    	return vehicleEntityService.updateByVehicleID(vehicle,id);
     }
     
     @GetMapping("/{id}")
     public Optional<Vehicle> getVehicleById(@PathVariable Long id) {
-        return vehicleService.getVehicleById(id);
+        return vehicleEntityService.getVehicleById(id);
     }
     
     @GetMapping("/update/{id}")
     public VehicleUpdate getVehicleUpdateById(@PathVariable Long id) {
-        return vehicleService.getVehicleUpdateById(id);
+        return vehicleEntityService.getVehicleUpdateById(id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteVehicle(@PathVariable Long id) {
-        vehicleService.deleteVehicle(id);
-        return ResponseEntity.ok("Vehicle Deleted");
+    public ResponseEntity<?> deleteVehicle(@PathVariable Long id) {
+        return vehicleEntityService.deleteVehicle(id);
     }
     
     @GetMapping("/status/available")
     public List<VehicleDAO> getAvailablevehicles(){
-    	return  vehicleService.findbyStatus().stream().map(i->new VehicleDAO(i)).collect(Collectors.toList()); 
+    	return  vehicleEntityService.findbyStatus(); 
     }
     
     @GetMapping("/status/assigned")
     public List<VehicleDAO> getAssignedvehicles(){
-    	return  vehicleService.findbyDriverStatus().stream().map(i->new VehicleDAO(i)).collect(Collectors.toList()); 
+    	return  vehicleEntityService.findbyDriverStatus(); 
     }
      
 }

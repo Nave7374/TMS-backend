@@ -13,7 +13,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -51,6 +53,7 @@ public class User {
     private String phoneNumber;
 
     @NotNull
+    @Email
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
@@ -59,8 +62,11 @@ public class User {
     private String role; // Example: ADMIN, USER, etc.
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+    private boolean isActive;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private PasswordResetToken token;
+    
     public User() {
     }
 
@@ -182,6 +188,14 @@ public class User {
 
 	public void setShipmenthistory(List<UserShipmentHistory> shipmenthistory) {
 		this.shipmenthistory = shipmenthistory;
+	}
+
+	public PasswordResetToken getToken() {
+		return token;
+	}
+
+	public void setToken(PasswordResetToken token) {
+		this.token = token;
 	}
 	
 }

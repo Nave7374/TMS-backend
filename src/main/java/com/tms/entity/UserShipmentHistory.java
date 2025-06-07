@@ -20,7 +20,7 @@ import jakarta.persistence.ManyToOne;
 public class UserShipmentHistory {
 	
 	@Id@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Long id;
 	private String origin;
 	private String shipmentnumber;
 	private String destination;
@@ -48,7 +48,7 @@ public class UserShipmentHistory {
 		this.user = user;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
@@ -68,7 +68,7 @@ public class UserShipmentHistory {
 		return date;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
