@@ -8,6 +8,7 @@ import com.tms.entity.Shipment;
 import com.tms.entity.User;
 import com.tms.entity.Vehicle;
 import com.tms.entity.VehicleStatus;
+import com.tms.exception.ShipmentIdNotfound;
 import com.tms.repository.LocationRepository;
 import com.tms.repository.ShipmentRepository;
 import com.tms.service.interfaces.DriverEntityService;
@@ -38,8 +39,10 @@ public class TrackingService implements TrackingEntityService {
     private ShipmentRepository shipmentRepository;
     
     @Override
-    public Location saveLocation(LocationDto location) {
-        return locationRepository.save(new Location(location));
+    public ResponseEntity<Location> saveLocation(LocationDto location) {
+        Location l = new Location(location);
+    	locationRepository.save(l);
+        return ResponseEntity.ok(l);
     }
     
     @Override
@@ -93,7 +96,7 @@ public class TrackingService implements TrackingEntityService {
 
 	@Override
 	public ResponseEntity<Location> getLocationByShipmentnumber(String str) {
-		Shipment s = shipmentRepository.findByShipmentNumber(str).orElse(null);
+		Shipment s = shipmentRepository.findByShipmentNumber(str).orElseThrow(()-> new ShipmentIdNotfound("Shipment ID not found"));
 //    	System.out.println("Gets triggered");
 //    	System.out.println(s);
     	if(s.getLocation()==null) return ResponseEntity.noContent().build();

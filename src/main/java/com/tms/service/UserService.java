@@ -4,12 +4,13 @@ import com.tms.DAO.SHipmentHistoryForUser;
 import com.tms.DAO.Update.UserUpdate;
 import com.tms.dto.PaginationDto;
 import com.tms.entity.User;
-import com.tms.exception.ResourceNotFoundException;
+import com.tms.exception.UserIdNotFound;
 import com.tms.repository.UserRepository;
 import com.tms.service.interfaces.UserEntityService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.crypto.password.PasswordEncoder; 
 import org.springframework.stereotype.Service;
@@ -28,23 +29,23 @@ public class UserService implements UserEntityService {
 //    private PasswordEncoder encoder;
 
     @Override
-    public Optional<User> findUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public ResponseEntity<User> findUserByUsername(String username) {
+        return ResponseEntity.ok(userRepository.findByUsername(username).orElseThrow(()-> new UserIdNotFound("Username not found")));
     }
 
     @Override
-    public Optional<User> findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public ResponseEntity<User> findUserByEmail(String email) {
+        return ResponseEntity.ok(userRepository.findByEmail(email).orElseThrow(()-> new UserIdNotFound("User Email not found")));
     }
 
     @Override
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public ResponseEntity<User> saveUser(User user) {
+        return ResponseEntity.ok(userRepository.save(user));
     }
     
     @Override
-    public List<User> fetchAll(){
-    	return userRepository.findAll();
+    public ResponseEntity<List<User>> fetchAll(){
+    	return ResponseEntity.ok(userRepository.findAll());
     }
     
     @Override
@@ -53,14 +54,14 @@ public class UserService implements UserEntityService {
     }
     
     @Override
-	public List<SHipmentHistoryForUser> getShipmentHistory(Long id) {
-		User user = findUserById(id).orElseThrow(()-> new ResourceNotFoundException("Shipment History Not Found"));
-		return user.getShipmenthistory().stream().map(i->new SHipmentHistoryForUser(i)).collect(Collectors.toList());
+	public ResponseEntity<List<SHipmentHistoryForUser>> getShipmentHistory(Long id) {
+		User user = findUserById(id).orElseThrow(()-> new UserIdNotFound("Shipment History Not Found"));
+		return ResponseEntity.ok(user.getShipmenthistory().stream().map(i->new SHipmentHistoryForUser(i)).collect(Collectors.toList()));
 	}
 
     @Override
-	public User updateByUserUpdateid(Long id, UserUpdate u) {
-		User user = userRepository.findById(id).orElse(null);
+	public ResponseEntity<User> updateByUserUpdateid(Long id, UserUpdate u) {
+		User user = userRepository.findById(id).orElseThrow(()-> new UserIdNotFound("User ID not found"));
 		user.setEmail(u.getEmail());
 		user.setFirstName(u.getFirstName());
 		user.setLastName(u.getLastName());
@@ -69,29 +70,27 @@ public class UserService implements UserEntityService {
 		user.setUsername(u.getUsername());
 		userRepository.save(user);
 //		System.out.println(u);
-		return user;
+		return ResponseEntity.ok(user);
 		
 	}
 
     @Override
-	public UserUpdate getUserUpdateById(Long id) {
-		User U = findUserById(id).orElse(null);
-		return new UserUpdate(U);
+	public ResponseEntity<UserUpdate> getUserUpdateById(Long id) {
+		User U = findUserById(id).orElseThrow(()-> new UserIdNotFound("User ID not found"));
+		return ResponseEntity.ok(new UserUpdate(U));
 	}
 
     @Override
 	public ResponseEntity<?> deleteUser(Long id) {
-		User u = findUserById(id).orElse(null);
-		if(u.getShipment()!=null) {
-			if(!u.getShipment().isEmpty())return ResponseEntity.badRequest().body("User Has Shipments cannot delete User");
-		}
+		User u = findUserById(id).orElseThrow(()-> new UserIdNotFound("User ID not found"));
+		if(!u.getShipment().isEmpty())return ResponseEntity.badRequest().body("User Has Shipments cannot delete User");
 		userRepository.delete(u);
 		return ResponseEntity.ok("User Deleted");
 	}
 
     @Override
-	public PaginationDto<User> findbypage(Integer pageno) {
-		return new PaginationDto<User>(userRepository.findAll(PageRequest.of(pageno-1, 2)));
+	public ResponseEntity<PaginationDto<User>> findbypage(Integer pageno) {
+		return ResponseEntity.ok(new PaginationDto<User>(userRepository.findAll(PageRequest.of(pageno-1, 2))));
 	}
 
 	@Override
@@ -102,5 +101,21 @@ public class UserService implements UserEntityService {
 	@Override
 	public boolean existsByEmail(String email) {
 		return userRepository.existsByEmail(email);
+	}
+
+	@Override
+	public Optional<User> findUserByUsernameOptional(String username) {
+		return userRepository.findByUsername(username);
+	}
+
+	@Override
+	public Optional<User> findUserByEmailOptional(String email) {
+		return userRepository.findByEmail(email);
+	}
+
+	@Override
+	public ResponseEntity<List<User>> fetchAllFilterByName() {
+		List<User> users  = userRepository.findAll(Sort.by("firstName"));
+		return ResponseEntity.ok(users);
 	}
 }

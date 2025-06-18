@@ -9,6 +9,6 @@ public interface UserAuthenticationService {
 
 	ResponseEntity<?> authenticateUser(LoginRequest loginRequest);
 
-	String register(SignupRequest signUpRequest);
+	ResponseEntity<String> register(SignupRequest signUpRequest);
 
 }

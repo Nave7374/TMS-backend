@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.tms.dto.LoginRequest;
 import com.tms.dto.SignupRequest;
 import com.tms.entity.User;
+import com.tms.exception.UserIdNotFound;
 import com.tms.service.interfaces.UserAuthenticationService;
 import com.tms.service.interfaces.UserEntityService;
 
@@ -29,16 +30,14 @@ public class AuthenticationService implements UserAuthenticationService {
 	
 	@Override
 	public ResponseEntity<?> authenticateUser(LoginRequest loginRequest){
-		User user = userEntityService.findUserByUsername(loginRequest.getUsername())
-                .orElse(null);
+		User user = userEntityService.findUserByUsernameOptional(loginRequest.getUsername()).orElseThrow(()-> new UserIdNotFound("Username not found"));
 //		System.out.println(loginRequest.getPassword());
 //		System.out.println(user.getPassword());
 //		System.out.println(encoder.encode(loginRequest.getPassword()));
-        if (user != null && user.isActive()  && encoder.matches(loginRequest.getPassword(), user.getPassword()) && user.getRole().equals(loginRequest.getRole())) {
+        if (user.isActive()  && encoder.matches(loginRequest.getPassword(), user.getPassword()) && user.getRole().equals(loginRequest.getRole())) {
             return ResponseEntity.ok("Login successful!");
         }
-        return ResponseEntity.ok("Invalid username or password!");
-        
+        return ResponseEntity.badRequest().body("Invalid password");
 
 //      Authentication authentication = authenticationManager.authenticate(
 //          new UsernamePasswordAuthenticationToken(
@@ -52,15 +51,16 @@ public class AuthenticationService implements UserAuthenticationService {
 	}
 
 	@Override
-	public String register(SignupRequest signUpRequest) {
+	public ResponseEntity<String> register(SignupRequest signUpRequest) {
 		if (userEntityService.existsByUsername(signUpRequest.getUsername())) {
-            return "Error: Username is already taken!";
+            return ResponseEntity.badRequest().body("Username is already taken!");
         }
+		if(userEntityService.existsByEmail(signUpRequest.getEmail())) throw new UserIdNotFound("Email already taken!");
         signUpRequest.setPassword(encoder.encode(signUpRequest.getPassword()));
         User user = new User(signUpRequest);
         
         userEntityService.saveUser(user);
 
-        return "User registered successfully!";
+        return ResponseEntity.ok("User registered successfully!");
 	}
 }

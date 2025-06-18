@@ -7,7 +7,7 @@ import com.tms.entity.Location;
 
 public interface TrackingEntityService {
 
-	Location saveLocation(LocationDto location);
+	ResponseEntity<Location> saveLocation(LocationDto location);
 
 	ResponseEntity<?> deleteLocation(Long id);
 

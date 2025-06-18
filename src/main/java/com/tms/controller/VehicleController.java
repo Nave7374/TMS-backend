@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:3000","https://transportmanagementsys.netlify.app"},allowedHeaders = "*")
@@ -24,7 +23,7 @@ public class VehicleController {
     private VehicleEntityService vehicleEntityService;
 
     @PostMapping("/add")
-    public Vehicle createVehicle(@RequestBody VehicleDTO vehicledto) {
+    public ResponseEntity<Vehicle> createVehicle(@RequestBody VehicleDTO vehicledto) {
     	return vehicleEntityService.saveVehicle(vehicledto);
     }
 
@@ -39,7 +38,7 @@ public class VehicleController {
     }
     
     @GetMapping 
-    public List<VehicleDAO> getAllVehicles() {
+    public ResponseEntity<List<VehicleDAO>> getAllVehicles() {
         return vehicleEntityService.getAllVehicles();
     }
 
@@ -49,12 +48,12 @@ public class VehicleController {
     }
     
     @GetMapping("/{id}")
-    public Optional<Vehicle> getVehicleById(@PathVariable Long id) {
+    public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long id) {
         return vehicleEntityService.getVehicleById(id);
     }
     
     @GetMapping("/update/{id}")
-    public VehicleUpdate getVehicleUpdateById(@PathVariable Long id) {
+    public ResponseEntity<VehicleUpdate> getVehicleUpdateById(@PathVariable Long id) {
         return vehicleEntityService.getVehicleUpdateById(id);
     }
 
@@ -64,12 +63,12 @@ public class VehicleController {
     }
     
     @GetMapping("/status/available")
-    public List<VehicleDAO> getAvailablevehicles(){
+    public ResponseEntity<List<VehicleDAO>> getAvailablevehicles(){
     	return  vehicleEntityService.findbyStatus(); 
     }
     
     @GetMapping("/status/assigned")
-    public List<VehicleDAO> getAssignedvehicles(){
+    public ResponseEntity<List<VehicleDAO>> getAssignedvehicles(){
     	return  vehicleEntityService.findbyDriverStatus(); 
     }
      

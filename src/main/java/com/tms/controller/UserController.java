@@ -21,42 +21,47 @@ public class UserController {
     private UserEntityService userEntityService;
     
 	@GetMapping
-   	public List<User> getAllUsers(){
+   	public ResponseEntity<List<User>> getAllUsers(){
 	   return userEntityService.fetchAll();
    	}
    
    	@GetMapping("/page/{pageno}")
-   	public PaginationDto<User> getMethodName(@PathVariable Integer pageno) {
+   	public ResponseEntity<PaginationDto<User>> getMethodName(@PathVariable Integer pageno) {
 	   return userEntityService.findbypage(pageno);
+   	}
+   	
+   	@GetMapping("/filterbyname")
+   	public ResponseEntity<List<User>> getAllUsersFilterByName(){
+   		return userEntityService.fetchAllFilterByName();
    	}
    
    	@PostMapping("/register")
-   	public User registerUser(@RequestBody User user) {
+   	public ResponseEntity<User> registerUser(@RequestBody User user) {
 	   return userEntityService.saveUser(user);
    	}
 
    	@GetMapping("/username/{username}")
-    public User getUserByUsername(@PathVariable String username) {
-       return userEntityService.findUserByUsername(username).orElse(null);
+    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
+       return userEntityService.findUserByUsername(username);
     }
 
     @GetMapping("/email/{email}")
-    public User getUserByEmail(@PathVariable String email) {
-        return userEntityService.findUserByEmail(email).orElse(null);
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+        return userEntityService.findUserByEmail(email);
     }
     
     @GetMapping("/shipmenthistory/{id}")
-    public List<SHipmentHistoryForUser> getUsersShipmentHistory(@PathVariable Long id){
+    public ResponseEntity<List<SHipmentHistoryForUser>> getUsersShipmentHistory(@PathVariable Long id){
     	return userEntityService.getShipmentHistory(id);
     }
     
     @PutMapping("/update/{id}")
-    public User updatetheUserByID(@PathVariable Long id,@RequestBody UserUpdate user) {
+    public ResponseEntity<User> updatetheUserByID(@PathVariable Long id,@RequestBody UserUpdate user) {
     	return userEntityService.updateByUserUpdateid(id,user);
     }
     
     @GetMapping("/update/{id}")
-    public UserUpdate getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserUpdate> getUserById(@PathVariable Long id) {
     	return userEntityService.getUserUpdateById(id); 
     }
     

@@ -31,37 +31,37 @@ public class DriverController {
 	private DriverEntityService driverEntityService;
 	
 	@PostMapping("login")
-	public String Authenticate(@RequestBody DriverLoginRequest dlr) {
+	public ResponseEntity<String> Authenticate(@RequestBody DriverLoginRequest dlr) {
 		return driverEntityService.Authenticate(dlr);
 	}
 	
 	@PostMapping("/register")
-	public String saveDriver(@RequestBody DriverDTO driver) {
+	public ResponseEntity<String> saveDriver(@RequestBody DriverDTO driver) {
 		return driverEntityService.saveDriver(driver);
 	}
 	
 	@GetMapping
-	public List<DriverDao> getAllDrivers(){
+	public ResponseEntity<List<DriverDao>> getAllDrivers(){
 		return driverEntityService.getAllDriver();
 	}
 	
 	@GetMapping("/username/{username}")
-	public Driver getDriverByUsername(@PathVariable String username){
-		return driverEntityService.getDriverByUsername(username).orElse(null);
+	public ResponseEntity<Driver> getDriverByUsername(@PathVariable String username){
+		return driverEntityService.getDriverByUsername(username);
 	}
 	
 	@GetMapping("/shipmenthistory/{id}")
-	public List<ShipmentHistoryForDriver> getShipmentHistory(@PathVariable Long id) {
+	public ResponseEntity<List<ShipmentHistoryForDriver>> getShipmentHistory(@PathVariable Long id) {
 		return driverEntityService.getShipmentHistory(id);
 	}
 	
 	@GetMapping("/{id}")
-	public Driver getDriverById(@PathVariable Long id) {
-		return driverEntityService.findById(id).orElse(null);		
+	public ResponseEntity<Driver> getDriverById(@PathVariable Long id) {
+		return driverEntityService.findById(id);		
 	}
 	
 	@GetMapping("/update/{id}")
-	public DriverUpdate getDriverUpdateById(@PathVariable Long id) {
+	public ResponseEntity<DriverUpdate> getDriverUpdateById(@PathVariable Long id) {
 		return driverEntityService.findDriverUpdateByid(id);	
 	}
 	

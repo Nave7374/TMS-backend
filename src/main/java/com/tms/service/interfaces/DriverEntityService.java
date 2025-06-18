@@ -15,24 +15,26 @@ import com.tms.entity.Driver;
  
 public interface DriverEntityService {
 
-	String Authenticate(DriverLoginRequest dlr);
+	ResponseEntity<String> Authenticate(DriverLoginRequest dlr);
 	
-	String saveDriver(DriverDTO driver);
+	ResponseEntity<String> saveDriver(DriverDTO driver);
 	
-	List<DriverDao> getAllDriver();
+	ResponseEntity<List<DriverDao>> getAllDriver();
 	
-	Optional<Driver> findById(Long id);
+	ResponseEntity<Driver> findById(Long id);
+
+	Optional<Driver> findByIdOptional(Long id);
 	
 	Driver save(Driver driver);
 	
 	ResponseEntity<?> deleteDriver(Long id);
 	
-	List<ShipmentHistoryForDriver> getShipmentHistory(Long id);
+	ResponseEntity<List<ShipmentHistoryForDriver>> getShipmentHistory(Long id);
 	
 	ResponseEntity<String> updateByid(DriverUpdate d);
 	
-	DriverUpdate findDriverUpdateByid(Long id);
+	ResponseEntity<DriverUpdate> findDriverUpdateByid(Long id);
 	
-	Optional<Driver> getDriverByUsername(String username);
+	ResponseEntity<Driver> getDriverByUsername(String username);
 	
 }

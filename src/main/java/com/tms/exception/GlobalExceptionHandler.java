@@ -1,28 +1,27 @@
 package com.tms.exception;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.mail.MessagingException;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return ResponseEntity.badRequest().body("An error occurred: " +ex.getMessage());
     }
     
     @ExceptionHandler(MessagingException.class)
     public ResponseEntity<String> handleException(MessagingException ex) {
-        return new ResponseEntity<>("An error occurred: " + ex.getMessage(), HttpStatus.BAD_GATEWAY);
+        return ResponseEntity.badRequest().body("An error occurred: " + ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception ex) {
-        return new ResponseEntity<>("An error occurred: " + ex.getMessage(), HttpStatus.OK);
+        return ResponseEntity.badRequest().body("An error occurred: " + ex.getMessage());
     }
     
 }

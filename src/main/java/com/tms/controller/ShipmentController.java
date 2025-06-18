@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import org.springframework.web.bind.annotation.GetMapping;
 
 
@@ -33,23 +32,23 @@ public class ShipmentController {
     }
     
     @PostMapping("/location/{str}")
-    public Location saveLocation(@PathVariable String str , @RequestBody LocationDto location ) {
+    public ResponseEntity<Location> saveLocation(@PathVariable String str , @RequestBody LocationDto location ) {
     	return shipmentEntityService.saveLocation(str,location);
     }
 
     @GetMapping
-    public List<ShipmentHistoryDto> getAllShipments() {
+    public ResponseEntity<List<ShipmentHistoryDto>> getAllShipments() {
     	return shipmentEntityService.getAllShipments();
     }
 
     @GetMapping("/user/shipment/history")
-    public List<SHipmentHistoryForUser> getUserShipmentHistory() {
+    public ResponseEntity<List<SHipmentHistoryForUser>> getUserShipmentHistory() {
         return shipmentEntityService.getUserShipmentHistory();
     }
     
     
     @GetMapping("/{id}")
-    public Optional<Shipment> getShipmentById(@PathVariable Long id) {
+    public ResponseEntity<Shipment> getShipmentById(@PathVariable Long id) {
         return shipmentEntityService.getShipmentById(id);
     }
     

@@ -17,6 +17,7 @@ import com.tms.dto.DriverLoginRequest;
 import com.tms.entity.Driver;
 import com.tms.entity.DriverStatus;
 import com.tms.entity.Vehicle;
+import com.tms.exception.DriverIdNotFound;
 import com.tms.repository.DriverRepository;
 import com.tms.service.interfaces.DriverEntityService;
 
@@ -30,45 +31,46 @@ public class DriverService implements DriverEntityService {
     private PasswordEncoder encoder;
 	
 	@Override
-	public String Authenticate(DriverLoginRequest dlr) {
-		Driver  d = driverRepository.findByUsername(dlr.getUsername()).orElse(null);
+	public ResponseEntity<String> Authenticate(DriverLoginRequest dlr) {
+		Driver  d = driverRepository.findByUsername(dlr.getUsername()).orElseThrow(()-> new DriverIdNotFound("Username not found"));
 		if(d!=null && encoder.matches(dlr.getPassword(), d.getPassword())) {
-			return "Login Successfull!";
+			return ResponseEntity.ok("Login Successfull!");
 		}
-		return "Invalid Credentials";
+		return ResponseEntity.badRequest().body("Invalid Credentials");
 	}
 
 	@Override
-	public String saveDriver(DriverDTO driver) {
-		if(driverRepository.existsByUsername(driver.getUsername())) return "Username Already Exists";
+	public ResponseEntity<String> saveDriver(DriverDTO driver) {
+		if(driverRepository.existsByUsername(driver.getUsername())) return ResponseEntity.badRequest().body("Username Already Exists");
+		if(driverRepository.existsByEmail(driver.getEmail())) return ResponseEntity.badRequest().body("Email Already Exist");
 		driver.setPassword(encoder.encode(driver.getPassword()));
 		Driver d = new Driver(driver);
 		driverRepository.save(d);
-		return "Driver Saved Succesfully";
+		return ResponseEntity.ok("Driver Saved Succesfully");
 	}
 	
 	@Override
-	public List<DriverDao> getAllDriver(){
-		return driverRepository.findAll().stream().map(i->new DriverDao(i)).collect(Collectors.toList());
+	public ResponseEntity<List<DriverDao>> getAllDriver(){
+		return ResponseEntity.ok(driverRepository.findAll().stream().map(i->new DriverDao(i)).collect(Collectors.toList()));
 	}
 	
 	@Override
-	public Optional<Driver> findById(Long id){
-		return driverRepository.findById(id);
+	public ResponseEntity<Driver> findById(Long id){
+		return ResponseEntity.ok(driverRepository.findById(id).orElseThrow(()->new DriverIdNotFound("Driver ID not found")));
 	}
 	
 	@Override
 	public Driver save(Driver driver) {
 		return driverRepository.save(driver);
 	}
-	
+
 	@Override
 	public ResponseEntity<?> deleteDriver(Long id) {
-		Driver d = findById(id).orElse(null);
+		Driver d = driverRepository.findById(id).orElseThrow(()-> new DriverIdNotFound("Driver ID not found"));
 		if(d.getVehicle()!=null) {
 			Vehicle v = d.getVehicle();
 			if(v.getShipment()!=null) {
-				return ResponseEntity.badRequest().body("Driver is Working on Shipment");
+				throw new DriverIdNotFound("Driver is Working on Shipment");
 			}
 			v.setDriverstatus(DriverStatus.AVAILABLE);
 			v.setDriver(null);
@@ -79,14 +81,14 @@ public class DriverService implements DriverEntityService {
 	}
 
 	@Override
-	public List<ShipmentHistoryForDriver> getShipmentHistory(Long id) {
-		Driver driver = driverRepository.findById(id).orElse(null);
-		return driver.getShipments().stream().map(i->new ShipmentHistoryForDriver(i)).collect(Collectors.toList());
+	public  ResponseEntity<List<ShipmentHistoryForDriver>> getShipmentHistory(Long id) {
+		Driver driver = driverRepository.findById(id).orElseThrow(()-> new DriverIdNotFound("Driver ID not found"));
+		return ResponseEntity.ok(driver.getShipments().stream().map(i->new ShipmentHistoryForDriver(i)).collect(Collectors.toList()));
 	}
 
 	@Override
 	public ResponseEntity<String> updateByid(DriverUpdate d) {
-		Driver driver=driverRepository.findById(d.getId()).orElse(null);
+		Driver driver=driverRepository.findById(d.getId()).orElseThrow(()-> new DriverIdNotFound("Driver ID not found"));
 		driver.setAge(d.getAge());
 		driver.setEmail(d.getEmail());
 		driver.setFirstname(d.getFirstname());
@@ -98,14 +100,19 @@ public class DriverService implements DriverEntityService {
 	}
 
 	@Override
-	public DriverUpdate findDriverUpdateByid(Long id) {
-		Driver d = driverRepository.findById(id).orElse(null);
-		return new DriverUpdate(d);
+	public ResponseEntity<DriverUpdate> findDriverUpdateByid(Long id) {
+		Driver d = driverRepository.findById(id).orElseThrow(()-> new DriverIdNotFound("Driver ID not found"));
+		return ResponseEntity.ok(new DriverUpdate(d));
 	}
 
 	@Override
-	public Optional<Driver> getDriverByUsername(String username) {
-		return driverRepository.findByUsername(username);
+	public ResponseEntity<Driver> getDriverByUsername(String username) {
+		return ResponseEntity.ok(driverRepository.findByUsername(username).orElseThrow(()-> new DriverIdNotFound("Driver Username not found")));
+	}
+
+	@Override
+	public Optional<Driver> findByIdOptional(Long id) {
+		return driverRepository.findById(id);
 	}
 	
 }

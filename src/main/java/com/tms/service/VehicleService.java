@@ -9,7 +9,9 @@ import com.tms.entity.Shipment;
 import com.tms.entity.ShipmentHistory;
 import com.tms.entity.Vehicle;
 import com.tms.entity.VehicleStatus;
-import com.tms.exception.ResourceNotFoundException;
+import com.tms.exception.DriverIdNotFound;
+import com.tms.exception.ShipmentIdNotfound;
+import com.tms.exception.VehicleIdNotFound;
 import com.tms.repository.ShipmentRepository;
 import com.tms.repository.VehicleRepository;
 import com.tms.service.interfaces.DriverEntityService;
@@ -21,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,23 +46,23 @@ public class VehicleService implements VehicleEntityService {
 	}
     
     @Override
-    public Vehicle saveVehicle(VehicleDTO vehicledto) {
-        return vehicleRepository.save(new Vehicle(vehicledto));
+    public ResponseEntity<Vehicle> saveVehicle(VehicleDTO vehicledto) {
+        return ResponseEntity.ok(vehicleRepository.save(new Vehicle(vehicledto)));
     }
 
     @Override
-    public List<VehicleDAO> getAllVehicles() {
-        return vehicleRepository.findAll().stream().map(i->new VehicleDAO(i)).collect(Collectors.toList());
+    public ResponseEntity<List<VehicleDAO>> getAllVehicles() {
+        return ResponseEntity.ok(vehicleRepository.findAll().stream().map(i->new VehicleDAO(i)).collect(Collectors.toList()));
     }
 
     @Override
-    public Optional<Vehicle> getVehicleById(Long id) {
-        return vehicleRepository.findById(id);
+    public 	ResponseEntity<Vehicle> getVehicleById(Long id) {
+        return ResponseEntity.ok(vehicleRepository.findById(id).orElseThrow(()-> new VehicleIdNotFound("Vehicle ID not found")));
     }
 
     @Override
     public ResponseEntity<?> deleteVehicle(Long id) {
-        Vehicle v = vehicleRepository.findById(id).orElse(null);
+        Vehicle v = vehicleRepository.findById(id).orElseThrow(()-> new VehicleIdNotFound("Vehicle ID not found"));
         if (v.getShipment() != null) {
 //            Shipment s = v.getShipment();
             return ResponseEntity.badRequest().body("Shipment Assigned for the Vehicle cannot Delete the vehicle");
@@ -78,26 +79,27 @@ public class VehicleService implements VehicleEntityService {
         return ResponseEntity.ok("Vehicle Deleted");
     }
     
+    
     @Override
-    public List<VehicleDAO> findbyStatus(){
-    	return vehicleRepository.findByStatus(VehicleStatus.AVAILABLE).stream().map(i->new VehicleDAO(i)).collect(Collectors.toList());
+    public ResponseEntity<List<VehicleDAO>> findbyStatus(){
+    	return ResponseEntity.ok(vehicleRepository.findByStatus(VehicleStatus.AVAILABLE).stream().map(i->new VehicleDAO(i)).collect(Collectors.toList()));
     }
 
     @Override
 	public ResponseEntity<String> assignToShipment(Long vehicleID, Long shipmentID) {
-		Vehicle vehicle = vehicleRepository.findById(vehicleID).orElseThrow(() -> new ResourceNotFoundException("Vehicle Not Found With the id "+vehicleID));
-		Shipment shipment = shipmentRepository.findById(shipmentID).orElseThrow(() -> new ResourceNotFoundException("Shipment Not Found With the id "+shipmentID));
+		Vehicle vehicle = vehicleRepository.findById(vehicleID).orElseThrow(()-> new VehicleIdNotFound("Vehicle ID not found With the id "+vehicleID));
+		Shipment shipment = shipmentRepository.findById(shipmentID).orElseThrow(() -> new ShipmentIdNotfound("Shipment Not Found With the id "+shipmentID));
 		vehicle.setStatus(VehicleStatus.ASSIGNED);
 		vehicle.setShipment(shipment);
 		shipment.setVehicle(vehicle);
 		vehicleRepository.save(vehicle);
-		return ResponseEntity.ok("Assigned successfully");
+		return ResponseEntity.ok("Vehicle Assigned successfully");
 	}
 
     @Override
 	public ResponseEntity<String> assignToDriver(Long vehicleID, Long driverID) { 
-		Vehicle vehicle = vehicleRepository.findById(vehicleID).orElseThrow(()->new ResourceNotFoundException("Vehicle Not Found with the id "+vehicleID));
-		Driver driver = driverEntityService.findById(vehicleID).orElseThrow(()->new ResourceNotFoundException("Vehicle Not Found with the id "+driverID));
+		Vehicle vehicle = vehicleRepository.findById(vehicleID).orElseThrow(()-> new VehicleIdNotFound("Vehicle ID not found with the id "+vehicleID));
+		Driver driver = driverEntityService.findByIdOptional(driverID).orElseThrow(()->new DriverIdNotFound("Driver Not Found with the id "+driverID));
 		vehicle.setDriverstatus(DriverStatus.ASSIGNED);
 		vehicle.setDriver(driver);
 		driver.setVehicle(vehicle);
@@ -107,17 +109,17 @@ public class VehicleService implements VehicleEntityService {
 		driver.setShipments(s);
 		shipmentHistoryEntityService.save(s);
 		vehicleRepository.save(vehicle);
-		return ResponseEntity.ok("Assigned successfully");
+		return ResponseEntity.ok("Driver Assigned successfully");
 	}
     
     @Override
-    public List<VehicleDAO> findbyDriverStatus() {
-		return vehicleRepository.findByDriverstatusAndStatus(DriverStatus.AVAILABLE,VehicleStatus.ASSIGNED).stream().map(i->new VehicleDAO(i)).collect(Collectors.toList());
+    public ResponseEntity<List<VehicleDAO>> findbyDriverStatus() {
+		return ResponseEntity.ok(vehicleRepository.findByDriverstatusAndStatus(DriverStatus.AVAILABLE,VehicleStatus.ASSIGNED).stream().map(i->new VehicleDAO(i)).collect(Collectors.toList()));
 	}
 
     @Override
 	public ResponseEntity<String> updateByVehicleID(VehicleUpdate vehicle,Long id) {
-		Vehicle v = vehicleRepository.findById(vehicle.getId()).orElse(null);
+		Vehicle v = vehicleRepository.findById(vehicle.getId()).orElseThrow(()-> new VehicleIdNotFound("Vehicle ID not found"));
 		v.setMake(vehicle.getMake());
 		v.setModel(vehicle.getModel());
 		v.setRegistrationNumber(vehicle.getRegistrationNumber());
@@ -129,8 +131,8 @@ public class VehicleService implements VehicleEntityService {
 	}
 
     @Override
-	public VehicleUpdate getVehicleUpdateById(Long id) {
-		Vehicle v = getVehicleById(id).orElse(null);
-		return new VehicleUpdate(v);
+	public ResponseEntity<VehicleUpdate> getVehicleUpdateById(Long id) {
+		Vehicle v = getVehicleById(id).getBody();
+		return ResponseEntity.ok(new VehicleUpdate(v));
 	}
 }

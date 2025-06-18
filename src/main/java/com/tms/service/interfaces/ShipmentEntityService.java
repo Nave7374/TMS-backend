@@ -20,9 +20,9 @@ public interface ShipmentEntityService {
 	
 	ResponseEntity<?> createShipment(Long id, ShipmentDTO shipment) throws MessagingException;
 	
-	List<ShipmentHistoryDto> getAllShipments();
+	ResponseEntity<List<ShipmentHistoryDto>> getAllShipments();
 	
-	Optional<Shipment> getShipmentById(Long id);
+	ResponseEntity<Shipment> getShipmentById(Long id);
 	
 	ResponseEntity<?> deleteShipment(Long id);
 	
@@ -30,9 +30,9 @@ public interface ShipmentEntityService {
 	
 	ResponseEntity<?> findByUserId(Long id);
 	
-	Location saveLocation(String str, LocationDto location);
+	ResponseEntity<Location> saveLocation(String str, LocationDto location);
 	
-	List<SHipmentHistoryForUser> getUserShipmentHistory();
+	ResponseEntity<List<SHipmentHistoryForUser>> getUserShipmentHistory();
 
 	Optional<Shipment> findById(Long shipmentID);
 	

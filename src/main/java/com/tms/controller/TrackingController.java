@@ -17,7 +17,7 @@ public class TrackingController {
     private TrackingEntityService trackingEntityService;
 
     @PostMapping("/save")
-    public Location saveLocation(@RequestBody LocationDto location) {
+    public ResponseEntity<Location> saveLocation(@RequestBody LocationDto location) {
         return trackingEntityService.saveLocation(location);
     }
 

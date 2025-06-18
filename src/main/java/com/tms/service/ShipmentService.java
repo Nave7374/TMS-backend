@@ -10,6 +10,8 @@ import com.tms.entity.Shipment;
 import com.tms.entity.User;
 import com.tms.entity.Vehicle;
 import com.tms.entity.VehicleStatus;
+import com.tms.exception.ShipmentIdNotfound;
+import com.tms.exception.UserIdNotFound;
 import com.tms.repository.ShipmentRepository;
 import com.tms.service.interfaces.EmailEntityService;
 import com.tms.service.interfaces.ShipmentEntityService;
@@ -20,7 +22,7 @@ import com.tms.service.interfaces.UserShipmenthistoryEntityService;
 import jakarta.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity; 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,29 +54,28 @@ public class ShipmentService implements ShipmentEntityService {
 
     @Override
     public ResponseEntity<?> createShipment(Long id, ShipmentDTO shipment) throws MessagingException {
-		User user = userEntityService.findUserById(id).orElse(null);
+		User user = userEntityService.findUserById(id).orElseThrow(()-> new UserIdNotFound("User ID not found"));
     	Shipment s = new Shipment(shipment);
     	user.addShipments(s);
     	userEntityService.saveUser(user);
     	return emailEntityService.sendConfirmationMail(user,s);
-    	
 	}
     
     @Override
-    public List<ShipmentHistoryDto> getAllShipments() {
+    public ResponseEntity<List<ShipmentHistoryDto>> getAllShipments() {
     	List<Shipment> l = shipmentRepository.findAll();
     	List<ShipmentHistoryDto> history = l.stream().map(i-> new ShipmentHistoryDto(i)).collect(Collectors.toList());
-    	return history;
+    	return ResponseEntity.ok(history);
     }
-
+    
     @Override
-    public Optional<Shipment> getShipmentById(Long id) {
-        return shipmentRepository.findById(id);
+    public ResponseEntity<Shipment> getShipmentById(Long id) {
+        return ResponseEntity.ok(shipmentRepository.findById(id).orElseThrow(()-> new ShipmentIdNotfound("Shipment ID not found")));
     }
-
+    
     @Override
     public ResponseEntity<?> deleteShipment(Long id) {
-    	Shipment s = shipmentRepository.findById(id).orElse(null);
+    	Shipment s = shipmentRepository.findById(id).orElseThrow(()-> new ShipmentIdNotfound("Shipment ID not found"));
     	if(s.getVehicle()!=null) {
     		Vehicle v = s.getVehicle();
     		if(v.getDriver()!=null) {
@@ -106,8 +107,8 @@ public class ShipmentService implements ShipmentEntityService {
 	}
 
     @Override
-	public Location saveLocation(String str, LocationDto location) {
-		Shipment shipment = shipmentRepository.findByShipmentNumber(str).orElse(null);
+	public ResponseEntity<Location> saveLocation(String str, LocationDto location) {
+		Shipment shipment = shipmentRepository.findByShipmentNumber(str).orElseThrow(()-> new ShipmentIdNotfound("Shipment ID not found"));
     	Location location1 = shipment.getLocation();
     	if (location1!= null) {
     	        location1.setLatitude(location.getLatitude());
@@ -120,12 +121,12 @@ public class ShipmentService implements ShipmentEntityService {
     	    location1.setShipment(shipment);
     	    }
     	shipmentRepository.save(shipment);
-    	return location1;
+    	return ResponseEntity.ok(location1);
 	}
 
     @Override
-	public List<SHipmentHistoryForUser> getUserShipmentHistory() {
-		return userShipmenthistoryEntityService.getAllShipmentHistory();
+	public ResponseEntity<List<SHipmentHistoryForUser>> getUserShipmentHistory() {
+		return ResponseEntity.ok(userShipmenthistoryEntityService.getAllShipmentHistory());
 	}
 
 	@Override

@@ -12,28 +12,34 @@ import com.tms.entity.User;
 
 public interface UserEntityService {
 
-	Optional<User> findUserByUsername(String username);
+	ResponseEntity<User> findUserByUsername(String username);
 
-	Optional<User> findUserByEmail(String email);
+	ResponseEntity<User> findUserByEmail(String email);
 
-	User saveUser(User user);
+	ResponseEntity<User> saveUser(User user);
 
-	List<User> fetchAll();
+	ResponseEntity<List<User>> fetchAll();
 
 	Optional<User> findUserById(Long id);
 
-	List<SHipmentHistoryForUser> getShipmentHistory(Long id);
+	ResponseEntity<List<SHipmentHistoryForUser>> getShipmentHistory(Long id);
 
-	User updateByUserUpdateid(Long id, UserUpdate u);
+	ResponseEntity<User> updateByUserUpdateid(Long id, UserUpdate u);
 
-	UserUpdate getUserUpdateById(Long id);
+	ResponseEntity<UserUpdate> getUserUpdateById(Long id);
 
 	ResponseEntity<?> deleteUser(Long id);
 
-	PaginationDto<User> findbypage(Integer pageno);
+	ResponseEntity<PaginationDto<User>> findbypage(Integer pageno);
 
 	boolean existsByUsername(String username);
 
 	boolean existsByEmail(String email);
+
+	Optional<User> findUserByUsernameOptional(String username);
+
+	Optional<User> findUserByEmailOptional(String email);
+
+	ResponseEntity<List<User>> fetchAllFilterByName();
 
 }
