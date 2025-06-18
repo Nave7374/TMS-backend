@@ -1,9 +1,15 @@
 package com.tms.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.tms.dto.LocationDto;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,8 +30,16 @@ public class Location {
     
     private Double latitude;
     private Double longitude;
-
-    @OneToOne
+    
+    @CreationTimestamp
+    @Column(updatable = false)
+	private LocalDateTime inserttime;
+	
+	@UpdateTimestamp
+	@Column(insertable = false)
+	private LocalDateTime updatetime;
+    
+	@OneToOne
     @JoinColumn(name="shipment_id")
 //    @JsonBackReference
     private Shipment shipment;
@@ -71,5 +85,21 @@ public class Location {
 
 	public void setShipment(Shipment shipment) {
 		this.shipment = shipment;
+	}
+
+	public LocalDateTime getInserttime() {
+		return inserttime;
+	}
+
+	public LocalDateTime getUpdatetime() {
+		return updatetime;
+	}
+
+	public void setInserttime(LocalDateTime inserttime) {
+		this.inserttime = inserttime;
+	}
+
+	public void setUpdatetime(LocalDateTime updatetime) {
+		this.updatetime = updatetime;
 	}
 }

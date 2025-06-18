@@ -2,6 +2,7 @@ package com.tms.service.interfaces;
 
 import org.springframework.http.ResponseEntity;
 
+import com.tms.entity.Location;
 import com.tms.entity.Shipment;
 import com.tms.entity.User;
 
@@ -15,4 +16,6 @@ public interface EmailEntityService {
 
 	ResponseEntity<?> sendConfirmationMail(User user, Shipment s) throws MessagingException;
 
+	void sendShipmentDeliveredEmail(Shipment s , User user, Location l) throws MessagingException;
+	
 }

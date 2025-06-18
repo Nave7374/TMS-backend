@@ -4,6 +4,8 @@ import com.tms.dto.LocationDto;
 import com.tms.entity.Location;
 import com.tms.service.interfaces.TrackingEntityService;
 
+import jakarta.mail.MessagingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +29,7 @@ public class TrackingController {
      }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletLocation(@PathVariable Long id) {
+    public ResponseEntity<?> deletLocation(@PathVariable Long id) throws MessagingException {
     	return trackingEntityService.deleteLocation(id);
    	}
 }

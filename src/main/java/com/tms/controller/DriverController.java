@@ -30,7 +30,7 @@ public class DriverController {
 	@Autowired
 	private DriverEntityService driverEntityService;
 	
-	@PostMapping("login")
+	@PostMapping("/login")
 	public ResponseEntity<String> Authenticate(@RequestBody DriverLoginRequest dlr) {
 		return driverEntityService.Authenticate(dlr);
 	}

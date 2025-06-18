@@ -12,9 +12,12 @@ import com.tms.exception.ShipmentIdNotfound;
 import com.tms.repository.LocationRepository;
 import com.tms.repository.ShipmentRepository;
 import com.tms.service.interfaces.DriverEntityService;
+import com.tms.service.interfaces.EmailEntityService;
 import com.tms.service.interfaces.TrackingEntityService;
 import com.tms.service.interfaces.UserEntityService;
 import com.tms.service.interfaces.VehicleEntityService;
+
+import jakarta.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity; 
@@ -38,6 +41,9 @@ public class TrackingService implements TrackingEntityService {
     @Autowired
     private ShipmentRepository shipmentRepository;
     
+    @Autowired
+    private EmailEntityService emailEntityService;
+    
     @Override
     public ResponseEntity<Location> saveLocation(LocationDto location) {
         Location l = new Location(location);
@@ -52,12 +58,14 @@ public class TrackingService implements TrackingEntityService {
     }
 
     @Override
-    public ResponseEntity<?> deleteLocation(Long id) {
+    public ResponseEntity<?> deleteLocation(Long id) throws MessagingException {
         Location location = locationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Location not found with ID: " + id));
 
         Shipment shipment = location.getShipment();
         if (shipment != null) {
+        	User user = shipment.getUser();
+        	emailEntityService.sendShipmentDeliveredEmail(shipment, user , location);
             location.setShipment(null);
             shipment.setLocation(null);
 
@@ -78,7 +86,6 @@ public class TrackingService implements TrackingEntityService {
 
             shipment.setVehicle(null);
 
-            User user = shipment.getUser();
             if (user != null) {
                 user.removeShipment(shipment);
                 userEntityService.saveUser(user);

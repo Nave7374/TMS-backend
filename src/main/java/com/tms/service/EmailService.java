@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.tms.entity.Location;
 import com.tms.entity.Shipment;
 import com.tms.entity.User;
 import com.tms.exception.UserIdNotFound;
@@ -41,6 +42,11 @@ public class EmailService implements EmailEntityService{
 		emailSender.sendEmailforShipment(user,shipment);
 //		emailSender.testAsync();
 		return ResponseEntity.ok("Shipment Booked Succesfully");
+	}
+
+	@Override
+	public void sendShipmentDeliveredEmail(Shipment s,User user, Location l) throws MessagingException {
+		emailSender.sendEmailforShipmentDelivered(s,user,l);
 	}
 
 

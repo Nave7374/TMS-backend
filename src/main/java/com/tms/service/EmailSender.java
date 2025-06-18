@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.tms.entity.Location;
 import com.tms.entity.PasswordResetToken;
 import com.tms.entity.Shipment;
 import com.tms.entity.User;
@@ -114,6 +115,45 @@ public class EmailSender {
 		
 		MailSender.send(message);
 		
+	}
+
+	@Async
+	public void sendEmailforShipmentDelivered(Shipment shipment, User user, Location l) throws MessagingException {
+		String to = user.getEmail();
+		String name = user.getFirstName() +" " +user.getLastName();
+		String subject = "Shipment Delivered";
+		String link = "http://localhost:3000/profile";
+		String origin = shipment.getOrigin();
+		String destination = shipment.getDestination();
+		String shipmentid = shipment.getShipmentNumber();
+		Date shipmentdate = shipment.getShipmentDate();
+		SimpleDateFormat sm = new SimpleDateFormat("dd-mm-yyyy");
+		String date = sm.format(shipmentdate);
+		String body="""
+				<p>Hello <b>%s</b>,</p>
+					<p>
+					    Your shipment from <b>%s</b> to <b>%s</b> on <b>%s</b> has been 
+					    <span style="color:green;"><b>Delivered Successfully</b></span>
+					    with Shipment ID: <b>%s</b>.
+					</p>
+					
+					<p>
+					    <a href="%s" style="background-color:green;color:white;padding:10px 15px;text-decoration:none;border-radius:5px;display:inline-block;">
+					        Find You Shipment
+					    </a>
+					</p>
+				<p>Thanks,<br/>TMS Admin</p>
+
+				""".formatted(name,origin,destination,date,shipmentid,link);
+		
+		MimeMessage message = MailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message,"utf-8");
+		helper.setFrom(from);
+		helper.setTo(to);
+		helper.setSubject(subject);
+		helper.setText(body,true);
+		
+		MailSender.send(message);
 	}
 	
 }
